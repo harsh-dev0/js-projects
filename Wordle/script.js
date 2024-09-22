@@ -3,9 +3,7 @@ import { testDictionary, realDictionary } from './dictionary.js';
 const dictionary = realDictionary;
 const state = {
   secret: dictionary[Math.floor(Math.random() * dictionary.length)],
-  grid: Array(6)
-    .fill()
-    .map(() => Array(5).fill('')),
+  grid: Array.from({ length: 6 }, () => Array(5).fill('')),
   currentRow: 0,
   currentCol: 0,
 };
@@ -37,39 +35,47 @@ function drawBox(container, row, col, letter = '') {
   box.className = 'box';
   box.textContent = letter;
   box.id = `box${row}${col}`;
-
   container.appendChild(box);
-  return box;
 }
 
 function registerKeyboardEvents() {
+  // Using both keyboard events and an input field for mobile compatibility
   document.body.onkeydown = (e) => {
-    const key = e.key;
-    if (key === 'Enter') {
-      if (state.currentCol === 5) {
-        const word = getCurrentWord();
-        if (isWordValid(word)) {
-          revealWord(word);
-          state.currentRow++;
-          state.currentCol = 0;
-        } else {
-          alert('Not a valid word.');
-        }
-      }
-    }
-    if (key === 'Backspace') {
-      removeLetter();
-    }
-    if (isLetter(key)) {
-      addLetter(key);
-    }
-
+    handleKeyInput(e.key);
     updateGrid();
   };
+
+  const hiddenInput = document.getElementById('hiddenInput');
+  hiddenInput.addEventListener('input', (e) => {
+    handleKeyInput(e.target.value);
+    e.target.value = ''; // Clear input after processing
+  });
+
+  // Focus on the hidden input for mobile keyboard
+  hiddenInput.focus();
+}
+
+function handleKeyInput(key) {
+  if (key === 'Enter') {
+    if (state.currentCol === 5) {
+      const word = getCurrentWord();
+      if (isWordValid(word)) {
+        revealWord(word);
+        state.currentRow++;
+        state.currentCol = 0;
+      } else {
+        alert('Not a valid word.');
+      }
+    }
+  } else if (key === 'Backspace') {
+    removeLetter();
+  } else if (isLetter(key)) {
+    addLetter(key);
+  }
 }
 
 function getCurrentWord() {
-  return state.grid[state.currentRow].reduce((prev, curr) => prev + curr);
+  return state.grid[state.currentRow].join('');
 }
 
 function isWordValid(word) {
@@ -77,44 +83,26 @@ function isWordValid(word) {
 }
 
 function getNumOfOccurrencesInWord(word, letter) {
-  let result = 0;
-  for (let i = 0; i < word.length; i++) {
-    if (word[i] === letter) {
-      result++;
-    }
-  }
-  return result;
+  return word.split(letter).length - 1;
 }
 
 function getPositionOfOccurrence(word, letter, position) {
-  let result = 0;
-  for (let i = 0; i <= position; i++) {
-    if (word[i] === letter) {
-      result++;
-    }
-  }
-  return result;
+  return word.slice(0, position + 1).split(letter).length - 1;
 }
 
 function revealWord(guess) {
   const row = state.currentRow;
-  const animation_duration = 500; // ms
+  const animationDuration = 500; // ms
 
   for (let i = 0; i < 5; i++) {
     const box = document.getElementById(`box${row}${i}`);
     const letter = box.textContent;
-    const numOfOccurrencesSecret = getNumOfOccurrencesInWord(
-      state.secret,
-      letter
-    );
+    const numOfOccurrencesSecret = getNumOfOccurrencesInWord(state.secret, letter);
     const numOfOccurrencesGuess = getNumOfOccurrencesInWord(guess, letter);
     const letterPosition = getPositionOfOccurrence(guess, letter, i);
 
     setTimeout(() => {
-      if (
-        numOfOccurrencesGuess > numOfOccurrencesSecret &&
-        letterPosition > numOfOccurrencesSecret
-      ) {
+      if (numOfOccurrencesGuess > numOfOccurrencesSecret && letterPosition > numOfOccurrencesSecret) {
         box.classList.add('empty');
       } else {
         if (letter === state.secret[i]) {
@@ -125,10 +113,10 @@ function revealWord(guess) {
           box.classList.add('empty');
         }
       }
-    }, ((i + 1) * animation_duration) / 2);
+    }, (i + 1) * animationDuration / 2);
 
     box.classList.add('animated');
-    box.style.animationDelay = `${(i * animation_duration) / 2}ms`;
+    box.style.animationDelay = `${(i * animationDuration) / 2}ms`;
   }
 
   const isWinner = state.secret === guess;
@@ -140,28 +128,39 @@ function revealWord(guess) {
     } else if (isGameOver) {
       alert(`Better luck next time! The word was ${state.secret}.`);
     }
-  }, 3 * animation_duration);
+  }, 3 * animationDuration);
 }
 
 function isLetter(key) {
-  return key.length === 1 && key.match(/[a-z]/i);
+  return key.length === 1 && /^[a-z]$/i.test(key);
 }
 
 function addLetter(letter) {
-  if (state.currentCol === 5) return;
-  state.grid[state.currentRow][state.currentCol] = letter;
-  state.currentCol++;
+  if (state.currentCol < 5) {
+    state.grid[state.currentRow][state.currentCol] = letter;
+    state.currentCol++;
+  }
 }
 
 function removeLetter() {
-  if (state.currentCol === 0) return;
-  state.grid[state.currentRow][state.currentCol - 1] = '';
-  state.currentCol--;
+  if (state.currentCol > 0) {
+    state.currentCol--;
+    state.grid[state.currentRow][state.currentCol] = '';
+  }
 }
 
 function startup() {
   const game = document.getElementById('game');
   drawGrid(game);
+
+  // Create and focus the hidden input field for mobile
+  const hiddenInput = document.createElement('input');
+  hiddenInput.type = 'text';
+  hiddenInput.id = 'hiddenInput';
+  hiddenInput.style.position = 'absolute';
+  hiddenInput.style.opacity = '0';
+  document.body.appendChild(hiddenInput);
+  hiddenInput.focus();
 
   registerKeyboardEvents();
 }
