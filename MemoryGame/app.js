@@ -84,7 +84,7 @@ function checkGameWin() {
             // Display the modal
             finalMoves.innerText = moves;
             modal.style.display = 'flex';
-            document.body.classList.add('celebrating'); // Add the celebration background
+            // document.body.classList.add('celebrating'); // Add the celebration background
         }, 500);
     }
 }
@@ -92,7 +92,7 @@ function checkGameWin() {
 // Reset the game when play again is clicked
 playAgainBtn.addEventListener('click', () => {
     modal.style.display = 'none';
-    document.body.classList.remove('celebrating'); // Remove the celebration background
+    // document.body.classList.remove('celebrating'); // Remove the celebration background
     resetGame();
 });
 

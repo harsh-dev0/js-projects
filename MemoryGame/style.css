@@ -1,9 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f0f0f0;
     margin: 0;
     padding: 20px;
+    height: 100vh;
+    background: linear-gradient(135deg, #f0f0f0, #c0c0f0) no-repeat;
 }
 
 h1 {
@@ -46,7 +54,7 @@ p {
 
 /* Modal Styles */
 .modal {
-    display: none; /* Hidden by default */
+    display: flex; /* Hidden by default */
     position: fixed;
     z-index: 1000; /* Stay on top */
     left: 0;
@@ -78,6 +86,7 @@ p {
 }
 
 #playAgain {
+    margin-top: 10px;
     padding: 10px 20px;
     background-color: #28a745;
     color: #fff;
