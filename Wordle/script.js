@@ -12,6 +12,7 @@ const state = {
   currentCol: 0,
 };
 
+
 function drawGrid(container) {
   const grid = document.createElement('div');
   grid.className = 'grid';
@@ -78,7 +79,7 @@ function getCurrentWord() {
 }
 
 function isWordValid(word) {
-  return dictionary.includes(word.toLowerCase());  // Convert to lowercase before checking
+  return dictionary.includes(word);  // Convert to lowercase before checking
 }
 
 function getNumOfOccurrencesInWord(word, letter) {
@@ -154,7 +155,7 @@ function isLetter(key) {
 
 function addLetter(letter) {
   if (state.currentCol === 5) return;
-  state.grid[state.currentRow][state.currentCol] = letter.toUpperCase();
+  state.grid[state.currentRow][state.currentCol] = letter.toLowerCase();
   state.currentCol++;
 }
 

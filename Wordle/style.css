@@ -89,8 +89,8 @@ body {
 .virtual-keyboard button {
   margin: 2px;
   padding: 10px;
-  font-size: 1rem;
-  min-width: 20px;
+  font-size: .8rem;
+  min-width: 10px;
 }
 
 @media (max-width: 480px) {
