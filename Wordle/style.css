@@ -80,47 +80,17 @@ body {
 }
 
 .virtual-keyboard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: none;
   justify-content: center;
+  flex-wrap: wrap;
   margin-top: 20px;
-  padding: 10px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.virtual-keyboard .row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 10px;
 }
 
 .virtual-keyboard button {
-  width: 22%;
   margin: 2px;
   padding: 10px;
   font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #eee;
-  cursor: pointer;
-}
-
-.virtual-keyboard button:active {
-  background-color: #ccc;
-}
-
-.virtual-keyboard .space {
-  width: 45%;
-}
-
-.virtual-keyboard .backspace {
-  width: 45%;
-  background-color: #f55;
-  color: #fff;
+  min-width: 20px;
 }
 
 @media (max-width: 480px) {
