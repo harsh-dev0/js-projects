@@ -1,6 +1,8 @@
 html,
 body {
   background: var(--default);
+  margin: 0;
+  padding: 0;
 }
 
 :root {
@@ -13,16 +15,16 @@ body {
 #game {
   display: flex;
   justify-content: center;
-  align-items: start;
-  margin-top: 5rem;
-  width: 100%;
-  height: 69vh;
+  align-items: center;
+  height: calc(100vh - 200px);
 }
 
 .grid {
   display: grid;
   grid-template-rows: repeat(6, auto);
   grid-template-columns: repeat(5, auto);
+  gap: 5px;
+  padding: 10px;
 }
 
 .box {
@@ -71,14 +73,38 @@ body {
   text-align: center;
   font-family: 'Segoe UI', 'sans-serif';
   font-size: 3rem;
-  margin-bottom: 0;
-  position: relative;
-  background: rgba(255, 255, 255, 0.1); 
-  border-radius: 8px;   
+  margin: 20px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
-hr {
-  border-style: solid;
-  border-color: var(--empty);
-  border-width: 1px;
+.virtual-keyboard {
+  display: none;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.virtual-keyboard button {
+  margin: 2px;
+  padding: 10px;
+  font-size: 1rem;
+  min-width: 30px;
+}
+
+@media (max-width: 480px) {
+  .box {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .virtual-keyboard {
+    display: flex;
+  }
 }

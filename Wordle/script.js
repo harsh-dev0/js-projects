@@ -1,6 +1,8 @@
 import { testDictionary, realDictionary } from './dictionary.js';
 
 const dictionary = realDictionary;
+
+console.log("Dictionary loaded:", dictionary.length, "words");
 const state = {
   secret: dictionary[Math.floor(Math.random() * dictionary.length)],
   grid: Array(6)
@@ -44,28 +46,31 @@ function drawBox(container, row, col, letter = '') {
 
 function registerKeyboardEvents() {
   document.body.onkeydown = (e) => {
-    const key = e.key;
-    if (key === 'Enter') {
-      if (state.currentCol === 5) {
-        const word = getCurrentWord();
-        if (isWordValid(word)) {
-          revealWord(word);
-          state.currentRow++;
-          state.currentCol = 0;
-        } else {
-          alert('Not a valid word.');
-        }
+    handleKeyInput(e.key);
+  };
+}
+
+function handleKeyInput(key) {
+  if (key === 'Enter') {
+    if (state.currentCol === 5) {
+      const word = getCurrentWord();
+      if (isWordValid(word)) {
+        revealWord(word);
+        state.currentRow++;
+        state.currentCol = 0;
+      } else {
+        alert('Not a valid word.');
       }
     }
-    if (key === 'Backspace') {
-      removeLetter();
-    }
-    if (isLetter(key)) {
-      addLetter(key);
-    }
+  }
+  if (key === 'Backspace') {
+    removeLetter();
+  }
+  if (isLetter(key)) {
+    addLetter(key);
+  }
 
-    updateGrid();
-  };
+  updateGrid();
 }
 
 function getCurrentWord() {
@@ -73,7 +78,7 @@ function getCurrentWord() {
 }
 
 function isWordValid(word) {
-  return dictionary.includes(word);
+  return dictionary.includes(word.toLowerCase());  // Convert to lowercase before checking
 }
 
 function getNumOfOccurrencesInWord(word, letter) {
@@ -149,7 +154,7 @@ function isLetter(key) {
 
 function addLetter(letter) {
   if (state.currentCol === 5) return;
-  state.grid[state.currentRow][state.currentCol] = letter;
+  state.grid[state.currentRow][state.currentCol] = letter.toUpperCase();
   state.currentCol++;
 }
 
@@ -159,11 +164,31 @@ function removeLetter() {
   state.currentCol--;
 }
 
+function createVirtualKeyboard() {
+  const keyboard = document.createElement('div');
+  keyboard.className = 'virtual-keyboard';
+  const keys = [
+    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
+    'Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'
+  ];
+
+  keys.forEach(key => {
+    const button = document.createElement('button');
+    button.textContent = key;
+    button.addEventListener('click', () => handleKeyInput(key));
+    keyboard.appendChild(button);
+  });
+
+  document.body.appendChild(keyboard);
+}
+
 function startup() {
   const game = document.getElementById('game');
   drawGrid(game);
 
   registerKeyboardEvents();
+  createVirtualKeyboard();
 }
 
 startup();
