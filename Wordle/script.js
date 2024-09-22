@@ -1,180 +1,169 @@
-import { realDictionary } from './dictionary.js';
+import { testDictionary, realDictionary } from './dictionary.js';
 
-class WordleGame {
-  constructor(dictionary) {
-    this.dictionary = dictionary;
-    this.state = {
-      secret: this.getRandomWord(),
-      grid: Array(6).fill().map(() => Array(5).fill('')),
-      currentRow: 0,
-      currentCol: 0,
-    };
-    this.gameContainer = document.getElementById('game');
-  }
+const dictionary = realDictionary;
+const state = {
+  secret: dictionary[Math.floor(Math.random() * dictionary.length)],
+  grid: Array(6)
+    .fill()
+    .map(() => Array(5).fill('')),
+  currentRow: 0,
+  currentCol: 0,
+};
 
-  getRandomWord() {
-    return this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
-  }
+function drawGrid(container) {
+  const grid = document.createElement('div');
+  grid.className = 'grid';
 
-  drawGrid() {
-    const grid = document.createElement('div');
-    grid.className = 'grid';
-
-    for (let i = 0; i < 6; i++) {
-      for (let j = 0; j < 5; j++) {
-        this.drawBox(grid, i, j);
-      }
-    }
-
-    this.gameContainer.appendChild(grid);
-  }
-
-  drawBox(container, row, col, letter = '') {
-    const box = document.createElement('div');
-    box.className = 'box';
-    box.textContent = letter;
-    box.id = `box${row}${col}`;
-
-    container.appendChild(box);
-    return box;
-  }
-
-  updateGrid() {
-    for (let i = 0; i < this.state.grid.length; i++) {
-      for (let j = 0; j < this.state.grid[i].length; j++) {
-        const box = document.getElementById(`box${i}${j}`);
-        box.textContent = this.state.grid[i][j];
-      }
+  for (let i = 0; i < 6; i++) {
+    for (let j = 0; j < 5; j++) {
+      drawBox(grid, i, j);
     }
   }
 
-  registerKeyboardEvents() {
-    document.body.onkeydown = (e) => {
-      this.handleKeyInput(e.key);
-    };
-  }
+  container.appendChild(grid);
+}
 
-  handleKeyInput(key) {
-    if (key === 'Enter') {
-      this.submitGuess();
-    } else if (key === 'Backspace') {
-      this.removeLetter();
-    } else if (this.isLetter(key)) {
-      this.addLetter(key);
+function updateGrid() {
+  for (let i = 0; i < state.grid.length; i++) {
+    for (let j = 0; j < state.grid[i].length; j++) {
+      const box = document.getElementById(`box${i}${j}`);
+      box.textContent = state.grid[i][j];
     }
-
-    this.updateGrid();
-  }
-
-  submitGuess() {
-    if (this.state.currentCol === 5) {
-      const word = this.getCurrentWord();
-      if (this.isWordValid(word)) {
-        this.revealWord(word);
-        this.state.currentRow++;
-        this.state.currentCol = 0;
-      } else {
-        this.showMessage('Not a valid word.');
-      }
-    }
-  }
-
-  getCurrentWord() {
-    return this.state.grid[this.state.currentRow].join('');
-  }
-
-  isWordValid(word) {
-    return this.dictionary.includes(word);
-  }
-
-  revealWord(guess) {
-    const row = this.state.currentRow;
-    const animation_duration = 500; // ms
-
-    for (let i = 0; i < 5; i++) {
-      const box = document.getElementById(`box${row}${i}`);
-      const letter = box.textContent;
-      const letterState = this.getLetterState(guess, letter, i);
-
-      setTimeout(() => {
-        box.classList.add(letterState, 'animated');
-      }, ((i + 1) * animation_duration) / 2);
-
-      box.style.animationDelay = `${(i * animation_duration) / 2}ms`;
-    }
-
-    this.checkGameEnd(guess);
-  }
-
-  getLetterState(guess, letter, position) {
-    if (letter === this.state.secret[position]) {
-      return 'right';
-    } else if (this.state.secret.includes(letter)) {
-      return 'wrong';
-    } else {
-      return 'empty';
-    }
-  }
-
-  checkGameEnd(guess) {
-    const isWinner = this.state.secret === guess;
-    const isGameOver = this.state.currentRow === 5;
-
-    setTimeout(() => {
-      if (isWinner) {
-        this.showMessage('Congratulations!');
-      } else if (isGameOver) {
-        this.showMessage(`Better luck next time! The word was ${this.state.secret}.`);
-      }
-    }, 1500);
-  }
-
-  showMessage(message) {
-    alert(message); // For simplicity, using alert. Consider creating a custom modal for better UX.
-  }
-
-  isLetter(key) {
-    return key.length === 1 && key.match(/[a-z]/i);
-  }
-
-  addLetter(letter) {
-    if (this.state.currentCol === 5) return;
-    this.state.grid[this.state.currentRow][this.state.currentCol] = letter.toUpperCase();
-    this.state.currentCol++;
-  }
-
-  removeLetter() {
-    if (this.state.currentCol === 0) return;
-    this.state.grid[this.state.currentRow][this.state.currentCol - 1] = '';
-    this.state.currentCol--;
-  }
-
-  createVirtualKeyboard() {
-    const keyboard = document.createElement('div');
-    keyboard.className = 'virtual-keyboard';
-    const keys = [
-      'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
-      'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
-      'Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'
-    ];
-
-    keys.forEach(key => {
-      const button = document.createElement('button');
-      button.textContent = key;
-      button.addEventListener('click', () => this.handleKeyInput(key));
-      keyboard.appendChild(button);
-    });
-
-    document.body.appendChild(keyboard);
-  }
-
-  init() {
-    this.drawGrid();
-    this.registerKeyboardEvents();
-    this.createVirtualKeyboard();
   }
 }
 
-// Initialize the game
-const game = new WordleGame(realDictionary);
-game.init();
+function drawBox(container, row, col, letter = '') {
+  const box = document.createElement('div');
+  box.className = 'box';
+  box.textContent = letter;
+  box.id = `box${row}${col}`;
+
+  container.appendChild(box);
+  return box;
+}
+
+function registerKeyboardEvents() {
+  document.body.onkeydown = (e) => {
+    const key = e.key;
+    if (key === 'Enter') {
+      if (state.currentCol === 5) {
+        const word = getCurrentWord();
+        if (isWordValid(word)) {
+          revealWord(word);
+          state.currentRow++;
+          state.currentCol = 0;
+        } else {
+          alert('Not a valid word.');
+        }
+      }
+    }
+    if (key === 'Backspace') {
+      removeLetter();
+    }
+    if (isLetter(key)) {
+      addLetter(key);
+    }
+
+    updateGrid();
+  };
+}
+
+function getCurrentWord() {
+  return state.grid[state.currentRow].reduce((prev, curr) => prev + curr);
+}
+
+function isWordValid(word) {
+  return dictionary.includes(word);
+}
+
+function getNumOfOccurrencesInWord(word, letter) {
+  let result = 0;
+  for (let i = 0; i < word.length; i++) {
+    if (word[i] === letter) {
+      result++;
+    }
+  }
+  return result;
+}
+
+function getPositionOfOccurrence(word, letter, position) {
+  let result = 0;
+  for (let i = 0; i <= position; i++) {
+    if (word[i] === letter) {
+      result++;
+    }
+  }
+  return result;
+}
+
+function revealWord(guess) {
+  const row = state.currentRow;
+  const animation_duration = 500; // ms
+
+  for (let i = 0; i < 5; i++) {
+    const box = document.getElementById(`box${row}${i}`);
+    const letter = box.textContent;
+    const numOfOccurrencesSecret = getNumOfOccurrencesInWord(
+      state.secret,
+      letter
+    );
+    const numOfOccurrencesGuess = getNumOfOccurrencesInWord(guess, letter);
+    const letterPosition = getPositionOfOccurrence(guess, letter, i);
+
+    setTimeout(() => {
+      if (
+        numOfOccurrencesGuess > numOfOccurrencesSecret &&
+        letterPosition > numOfOccurrencesSecret
+      ) {
+        box.classList.add('empty');
+      } else {
+        if (letter === state.secret[i]) {
+          box.classList.add('right');
+        } else if (state.secret.includes(letter)) {
+          box.classList.add('wrong');
+        } else {
+          box.classList.add('empty');
+        }
+      }
+    }, ((i + 1) * animation_duration) / 2);
+
+    box.classList.add('animated');
+    box.style.animationDelay = `${(i * animation_duration) / 2}ms`;
+  }
+
+  const isWinner = state.secret === guess;
+  const isGameOver = state.currentRow === 5;
+
+  setTimeout(() => {
+    if (isWinner) {
+      alert('Congratulations!');
+    } else if (isGameOver) {
+      alert(`Better luck next time! The word was ${state.secret}.`);
+    }
+  }, 3 * animation_duration);
+}
+
+function isLetter(key) {
+  return key.length === 1 && key.match(/[a-z]/i);
+}
+
+function addLetter(letter) {
+  if (state.currentCol === 5) return;
+  state.grid[state.currentRow][state.currentCol] = letter;
+  state.currentCol++;
+}
+
+function removeLetter() {
+  if (state.currentCol === 0) return;
+  state.grid[state.currentRow][state.currentCol - 1] = '';
+  state.currentCol--;
+}
+
+function startup() {
+  const game = document.getElementById('game');
+  drawGrid(game);
+
+  registerKeyboardEvents();
+}
+
+startup();
